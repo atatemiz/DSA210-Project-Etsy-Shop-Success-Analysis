@@ -267,6 +267,18 @@ By the end of the project, we expect to:
 
 ---
 
+## Milestone – 28 November
+
+- Selected the "Etsy Shops Dataset" from Kaggle (20,000 shops).
+- Performed basic exploratory data analysis:
+  - Histograms of number of listings, review counts, and reviews per listing.
+  - Scatter plot of number of listings vs review count (log–log scale).
+- Defined "successful shop" as having at least one review (review_count > 0).
+- Ran two Welch t-tests:
+  - Successful shops have significantly more active listings on average.
+  - Successful shops have significantly higher reviews per listing on average.
+
+
 ## 👥 Authors
 
 Prepared by:  
