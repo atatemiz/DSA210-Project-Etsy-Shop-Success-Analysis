@@ -1,6 +1,6 @@
 # 📊 DSA210 Project – Etsy Shop Success Analysis
 
-Spring 2025 · DSA210 Term Project  
+· DSA210 Term Project  
 
 ---
 
