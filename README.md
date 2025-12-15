@@ -1,9 +1,10 @@
-💰 DSA210 Project – Etsy Shop Success Analysis  
+# 💰 DSA210 Project – Etsy Shop Success Analysis  
 Spring 24–25 · DSA210 Term Project  
 
 ---
 
-📝 Project Overview
+## 📝 Project Overview
+
 This project studies Etsy shops and their products to understand what “success” looks like on the platform.
 
 Using two publicly available datasets from Kaggle (one at shop level, one at item level), I:
@@ -11,13 +12,14 @@ Using two publicly available datasets from Kaggle (one at shop level, one at ite
 - Clean and combine the data,
 - Create new, more informative features,
 - Explore distributions and relationships with visualizations,
-- Test three concrete statistical hypotheses about shop success and price levels.
+- Investigate three concrete statistical hypotheses about shop success and price levels.
 
 The final goal is to turn raw marketplace data into interpretable insights that could guide a small Etsy seller.
 
 ---
 
-🎯 Motivation
+## 🎯 Motivation
+
 Etsy is widely used by:
 
 - Designers and artists  
@@ -34,13 +36,13 @@ This project aims to answer:
 
 - Whether larger shops really perform better,
 - Whether engagement quality (reviews per product) differentiates successful shops,
-- How high-price items differ from lower-price items in a statistically meaningful way.
+- Whether item price can be linked to product popularity in a statistically meaningful way.
 
 ---
 
-📂 Datasets Used
+## 📂 Datasets Used
 
-1️⃣ **Etsy Shops (shop-level dataset)**  
+### 1️⃣ Etsy Shops (shop-level dataset)
 - Source: Kaggle – “Etsy Shops Dataset” by Sepideh Doost  
 - Approx. 20,000 shops opened in November–December 2019  
 - Example information:  
@@ -49,7 +51,7 @@ This project aims to answer:
   - Favourites, sales counts  
   - Shop location, creation date, and a shop identifier  
 
-2️⃣ **Etsy Items Price (item-level dataset)**  
+### 2️⃣ Etsy Items Price (item-level dataset)
 - Source: Kaggle – “Etsy Items Price” by dimakyn  
 - Product-level records with:  
   - Product title  
@@ -66,67 +68,62 @@ Link: https://www.kaggle.com/datasets/sepidafs/etsy-shops
 
 **Etsy Items Price** – Kaggle  
 Author: dimakyn  
-Link: https://www.kaggle.com/datasets/dimakyn/etsy-items-price
-
+Link: https://www.kaggle.com/datasets/dimakyn/etsy-items-price  
 
 ---
 
-🛠️ Feature Engineering (What I Built From the Raw Data)
+## 🛠️ Feature Engineering (What I Built From the Raw Data)
 
-From the **shop dataset**:
+### From the shop dataset:
 
 - **Shop size**  
   The number of active listings is used as a measure of how large a shop is.
 
 - **Engagement per product**  
-  For each shop, I divide the total number of reviews by the number of active listings.  
-  This gives “reviews per listing”, which reflects how much attention each product receives on average.  
-  Shops with zero listings are handled carefully to avoid meaningless divisions.
+  For each shop, the total number of reviews is divided by the number of active listings,  
+  resulting in “reviews per listing”. Shops with zero listings are handled carefully to avoid
+  invalid divisions.
 
 - **Success label for shops**  
-  I mark a shop as “successful” if it has at least one review.  
-  Shops with no reviews are treated as “non-successful”.  
-  This simple rule allows a clear comparison between two groups.
+  A shop is marked as “successful” if it has at least one review.  
+  Shops with no reviews are treated as “non-successful”.
 
-From the **item dataset**:
+### From the item dataset:
 
 - **Clean numeric prices**  
   Prices are converted into numeric values and rows with invalid or missing prices are removed.
 
 - **Price-based segments**  
-  I calculate the 75th percentile of the price distribution.  
-  Items whose price is at or above this threshold are assigned to a “high-price” segment,  
-  and the remaining items form a “low-price” segment.  
-  This creates two meaningful groups for comparing price levels.
-
-These engineered features are the building blocks for all later analysis and hypothesis tests.
+  The 75th percentile of the price distribution is used to define a “high-price” segment,  
+  while the remaining items form a “low-price” segment.  
+  This segmentation is used to explore price-level differences.
 
 ---
 
-📊 Exploratory Data Analysis
+## 📊 Exploratory Data Analysis
 
-Key observations from the visual exploration:
+Key observations from the visual exploration include:
 
-- **Shop size and reviews are highly skewed**  
-  Histograms show that most shops have very few listings and zero reviews,  
-  while a small group of shops has many products and a lot of feedback.
+- **Highly skewed shop characteristics**  
+  Most shops have very few listings and zero reviews, while a small fraction of shops
+  accumulates many products and substantial feedback.
 
-- **Relationship between number of listings and reviews**  
-  A scatter plot with logarithmic scales on both axes shows a clear positive relationship:  
-  larger shops tend to accumulate more reviews, although there is still considerable spread.
+- **Relationship between listings and reviews**  
+  A log–log scatter plot shows a clear positive association between shop size and total
+  reviews, although variability remains high.
 
 - **Item price distribution**  
-  A histogram of item prices (with extreme values clipped) reveals that most products  
-  sit in a relatively low price range, with a thin but visible tail of higher-priced items.  
-  This justifies creating “high-price” and “low-price” segments.
+  Item prices are concentrated in a lower range with a long tail of higher-priced items,
+  motivating the use of price-based segmentation.
 
 ---
 
-🧪 Hypothesis Tests and Findings
+## 🧪 Hypothesis Tests and Findings
 
-All three hypotheses are tested using two-sample t-tests that allow unequal variances  
-(commonly known as Welch t-tests). The aim is to compare averages between two groups and  
-decide whether the observed differences are statistically significant.
+Three hypotheses are investigated using statistical analysis.  
+For the first two hypotheses, two-sample Welch t-tests are applied.  
+For the third hypothesis, exploratory analysis revealed limitations in the item-level
+popularity variable, which affected the choice of statistical testing.
 
 ---
 
@@ -135,23 +132,9 @@ decide whether the observed differences are statistically significant.
 **Question**  
 Do shops that receive at least one review tend to list more products than shops with no reviews?
 
-**Groups**
-
-- Group A: shops marked as successful (at least one review)  
-- Group B: shops with no reviews  
-
-**Null hypothesis (H₀)**  
-The average number of active listings is the same in both groups.
-
-**Alternative hypothesis (H₁)**  
-Successful shops differ in average shop size (and in practice we expect them to be larger).
-
-**Result and interpretation**
-
-- The test returns a large positive test statistic and a very small p-value (well below 0.05).  
-- H₀ is rejected.  
-- Successful shops have **significantly more active listings** on average.  
-  In other words, being “larger” is strongly associated with receiving at least some feedback.
+**Result**  
+The Welch t-test produces a very small p-value, leading to rejection of the null hypothesis.  
+Successful shops have significantly more active listings on average.
 
 ---
 
@@ -160,99 +143,65 @@ Successful shops differ in average shop size (and in practice we expect them to 
 **Question**  
 Do successful shops receive more reviews per listing than shops with no reviews?
 
-**Groups**
-
-- Same two groups as in Hypothesis 1,  
-  but the comparison is now made on “reviews per listing”.
-
-**Null hypothesis (H₀)**  
-The average number of reviews per listing is the same for successful and non-successful shops.
-
-**Alternative hypothesis (H₁)**  
-Successful shops have a different (expected to be higher) average number of reviews per listing.
-
-**Result and interpretation**
-
-- Again, the test yields a large positive test statistic with a very small p-value.  
-- H₀ is rejected.  
-- Successful shops do not only have more products; each product also tends to receive **more engagement on average**.  
-  This suggests that **quality, visibility or marketing of listings** are also important,  
-  not just opening many products.
+**Result**  
+The Welch t-test again yields a very small p-value.  
+Successful shops not only have more products, but also receive higher engagement per product.
 
 ---
 
-### Hypothesis 3 – High-Price vs Low-Price Items
+### Hypothesis 3 – Item Price vs Popularity
 
 **Question**  
-Is the high-price segment (top 25% of items by price) truly different from the rest  
-in terms of average price?
+Is item price associated with item popularity?
 
-**Groups**
+**Data limitation**  
+Exploratory analysis revealed that the *favourite* variable in the item-level dataset has
+**zero variance across all items**. Because the popularity metric is constant, it does not
+carry usable information.
 
-- Group A: items in the top quarter of the price distribution (high-price segment)  
-- Group B: all remaining items (low-price segment)
-
-**Null hypothesis (H₀)**  
-Both segments have the same mean price (no meaningful separation).
-
-**Alternative hypothesis (H₁)**  
-The high-price segment has a different mean price than the low-price segment.
-
-**Result and interpretation**
-
-- The Welch t-test finds a very strong difference between the two groups,  
-  again with a p-value far below 0.05.  
-- H₀ is rejected.  
-- The price-based segmentation is statistically meaningful:  
-  high-price items form a clearly distinct group.  
-  This separation can later be used to compare other characteristics of premium vs regular products.
+**Conclusion**  
+Due to insufficient variability in the popularity metric, it is not statistically valid
+to perform group-based hypothesis testing or correlation analysis.  
+Therefore, **Hypothesis 3 is rejected**, as no meaningful relationship between item price and
+popularity can be evaluated using this dataset.
 
 ---
 
-📌 Overall Insights
-
-From the combined shop-level and item-level analysis, the main conclusions are:
+## 📌 Overall Insights
 
 1. **Shop size matters**  
-   Shops that receive at least one review tend to have **many more active listings**  
-   compared to shops that never receive feedback.
+   Shops that receive at least one review tend to have many more active listings.
 
 2. **Engagement per product matters**  
-   Successful shops also perform better in terms of **reviews per listing**.  
-   They do not simply win by sheer volume; their products also attract more attention individually.
+   Successful shops achieve higher reviews per listing, indicating that visibility,
+   quality, or marketing of products is important in addition to sheer volume.
 
-3. **Price tiers are clearly separated**  
-   The high-price segment is statistically distinct from the low-price segment.  
-   Price tiers therefore make sense as a basis for further analysis or later models.
-
-Together, these findings suggest that a seller aiming for success on Etsy should work on:
-
-- Expanding the catalog with a healthy number of listings,  
-- Improving engagement for each product (photos, descriptions, tags, marketing),  
-- Being aware of where their products sit in the price spectrum and  
-  possibly treating premium and regular items differently.
+3. **Item popularity could not be evaluated**  
+   Although item prices show a clear distribution, the available popularity indicator
+   (favourites) lacks variability. As a result, no statistically valid conclusion can be
+   drawn about the relationship between item price and popularity.
 
 ---
 
-🧰 Tools Used
+## 🧰 Tools Used
 
-- Python (for data cleaning, feature creation, plotting and statistical tests)  
-- Jupyter Notebook / VS Code Jupyter (interactive environment)  
-- Git and GitHub (for version control and project submission)
+- Python (data cleaning, feature engineering, visualization, statistics)  
+- Jupyter Notebook / VS Code Jupyter  
+- Git and GitHub  
 
 ---
 
-📁 Repository Contents
+## 📁 Repository Contents
 
-- Jupyter notebook with the full analysis  
+- Jupyter notebook containing the full analysis  
 - Shop-level dataset file  
 - Item-level dataset file  
-- This README explaining the project, methods and main results
+- This README explaining the project, methods, and findings  
 
 ---
 
-🤝 AI Assistance Disclosure
+## 🤝 AI Assistance Disclosure
 
-The structure and wording of this README were prepared with the help of an AI assistant (OpenAI ChatGPT).  
-All dataset choices, feature definitions, statistical tests and final interpretations  
-were implemented and checked by the project owner.
+The structure and wording of this README were prepared with the help of an AI assistant
+(OpenAI ChatGPT). All dataset choices, feature definitions, statistical tests, and final
+interpretations were implemented and verified by the project owner.
