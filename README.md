@@ -1,296 +1,249 @@
-# 📊 DSA210 Project – Etsy Shop Success Analysis
-
-· DSA210 Term Project  
-
----
-
-## 🧩 Project Overview
-
-This project analyzes **Etsy shops** using publicly available datasets (mainly from Kaggle) to understand what makes a shop **“successful”**.
-
-We focus on **shop-level** and (optionally) **listing-level** attributes such as:
-
-- Shop age  
-- Number of listings  
-- Ratings & reviews  
-- Price levels  
-- Digital vs physical / print-on-demand products  
-
-Our goal is to uncover patterns that can help **independent creators** and **small businesses** make better strategic decisions when starting or growing an Etsy shop.
+💰 DSA210 Project – Etsy Shop Success Analysis  
+Spring 24–25 · DSA210 Term Project  
 
 ---
 
-## 💡 Motivation
+📝 Project Overview
+This project studies Etsy shops and their products to understand what “success” looks like on the platform.
 
-Etsy is a key platform for:
+Using two publicly available datasets from Kaggle (one at shop level, one at item level), I:
 
-- Designers, artists, 3D-print makers  
-- Digital product creators (posters, printables, templates)  
-- Print-on-demand sellers  
+- Clean and combine the data,
+- Create new, more informative features,
+- Explore distributions and relationships with visualizations,
+- Test three concrete statistical hypotheses about shop success and price levels.
 
-But most new sellers have no clear idea **which factors actually matter** for success.
-
-This project aims to:
-
-- 🔍 Identify key attributes associated with higher sales / engagement  
-- 🧬 Compare **niche-focused** vs **general** shops  
-- 🤖 Build simple models that estimate a shop’s success likelihood based on its metadata  
+The final goal is to turn raw marketplace data into interpretable insights that could guide a small Etsy seller.
 
 ---
 
-## 🎯 Main Research Questions
+🎯 Motivation
+Etsy is widely used by:
 
-### 1️⃣ Shop-Level Success
+- Designers and artists  
+- 3D-print and handmade product makers  
+- Digital product and print-on-demand sellers  
 
-- Which features (shop age, number of listings, ratings, reviews, country, etc.) are most related to **high-performing** shops?
-- Do **niche shops** (focused on a small set of categories) outperform **general shops**?
+New sellers usually have questions such as:
 
-### 2️⃣ Products & Pricing
+- How many products should I list?
+- Do reviews and engagement per product matter as much as the total number of products?
+- How do my price levels relate to performance?
 
-- How do **average product price** and **price range** relate to shop success?
-- Are shops that mainly sell **digital / print-on-demand** products more successful than those focused on **physical** items?
+This project aims to answer:
 
-### 3️⃣ Predictive Aspect
-
-- Can we predict whether a shop will be **“successful”** (e.g., top X% by sales / favorites / reviews) using only basic shop metadata?
-- Which features are most important in this prediction?
-
----
-
-## 🧪 Hypotheses & Approach
-
-**Null Hypothesis (H₀)**  
-There is **no significant relationship** between shop-level features (e.g., age, listing count, digital share, ratings) and Etsy shop success metrics.
-
-**Alternative Hypothesis (H₁)**  
-Certain shop-level features have a **significant impact** on Etsy shop success.
-
-**General Approach:**
-
-1. **EDA (Exploratory Data Analysis)**  
-   - Inspect distributions, outliers, missing values  
-   - Compare feature distributions between successful vs non-successful shops  
-
-2. **Statistical Testing**  
-   - Use t-tests / non-parametric tests to check group differences  
-   - Correlation analysis between numeric features and success metrics  
-
-3. **Machine Learning**  
-   - Train simple models to **classify** or **predict** success  
-   - Interpret feature importance and connect back to real-world insights  
+- Whether larger shops really perform better,
+- Whether engagement quality (reviews per product) differentiates successful shops,
+- How high-price items differ from lower-price items in a statistically meaningful way.
 
 ---
 
-## 📂 Dataset Description
+📂 Datasets Used
 
-We plan to use one primary **shop-level** dataset and optionally a **listing-level** dataset from Kaggle, such as:
+1️⃣ **Etsy Shops (shop-level dataset)**  
+- Source: Kaggle – “Etsy Shops Dataset” by Sepideh Doost  
+- Approx. 20,000 shops opened in November–December 2019  
+- Example information:  
+  - Number of active listings per shop  
+  - Total number of reviews  
+  - Favourites, sales counts  
+  - Shop location, creation date, and a shop identifier  
 
-- **Etsy Shops (≈400K shops)** – large-scale dataset with shop metadata  
-- **Etsy Shops (≈20K shops)** – smaller, cleaner version with detailed shop info  
-- **Etsy Listings** – listing-level data (titles, descriptions, prices, reviews)  
+2️⃣ **Etsy Items Price (item-level dataset)**  
+- Source: Kaggle – “Etsy Items Price” by dimakyn  
+- Product-level records with:  
+  - Product title  
+  - Shop name  
+  - Item price  
+  - Number of favourites  
 
-> Exact dataset choice will be finalized at the implementation stage and clearly documented in the repo.
-
-### 🏪 Example Shop-Level Features
-
-- `shop_id` – unique shop identifier  
-- `shop_name` – shop name  
-- `shop_creation_date` – when the shop was opened  
-- `shop_age_days / shop_age_years` – derived from creation date  
-- `num_listings` – number of active listings  
-- `avg_rating` – average rating (1–5)  
-- `review_count` – total number of reviews  
-- `sales` or `sales_proxy` – sales, favorites, or similar success indicator (dataset-dependent)  
-- `country` / `location` – geographic info  
-- `main_category` / `tags` – dominant product category or tags (if available)  
-
-### 🧾 Example Listing-Level Features (Optional)
-
-- `listing_id` – unique product identifier  
-- `title`, `description` – textual info  
-- `price`, `currency` – pricing  
-- `favorites`, `listing_review_count` – engagement metrics  
-- `is_digital` (derived) – digital / print-on-demand vs physical indicator  
+The shop dataset describes the “storefront”, while the item dataset focuses on individual products and their prices.  
+They are used together to answer both shop-level and price-level questions.
 
 ---
 
-## 🧮 Feature Engineering (Planned)
+🛠️ Feature Engineering (What I Built From the Raw Data)
 
-To make the models and analysis more informative, we plan to derive the following features:
+From the **shop dataset**:
 
-- **Shop Age Bucket**  
-  - e.g., `New` (< 1 year), `Growing` (1–3 years), `Established` (> 3 years)
+- **Shop size**  
+  The number of active listings is used as a measure of how large a shop is.
 
-- **Listing Intensity**  
-  - `num_listings` normalized by shop age (listings per year)
+- **Engagement per product**  
+  For each shop, I divide the total number of reviews by the number of active listings.  
+  This gives “reviews per listing”, which reflects how much attention each product receives on average.  
+  Shops with zero listings are handled carefully to avoid meaningless divisions.
 
-- **Rating Segment**  
-  - `High` (≥ 4.8), `Medium` (4.0–4.79), `Low` (< 4.0)
+- **Success label for shops**  
+  I mark a shop as “successful” if it has at least one review.  
+  Shops with no reviews are treated as “non-successful”.  
+  This simple rule allows a clear comparison between two groups.
 
-- **Digital Share** (if listing data used)  
-  - Ratio of digital / print-on-demand listings to total listings
+From the **item dataset**:
 
-- **Category Focus Index**  
-  - How specialized a shop is; e.g., entropy-based or share of top category
+- **Clean numeric prices**  
+  Prices are converted into numeric values and rows with invalid or missing prices are removed.
 
-- **Price Statistics**  
-  - Average price, median price, minimum, maximum, price range
+- **Price-based segments**  
+  I calculate the 75th percentile of the price distribution.  
+  Items whose price is at or above this threshold are assigned to a “high-price” segment,  
+  and the remaining items form a “low-price” segment.  
+  This creates two meaningful groups for comparing price levels.
 
-- **Engagement Metrics**  
-  - Reviews per listing, favorites per listing (where available)
-
----
-
-## 📊 Statistical Analysis Plan
-
-### 1️⃣ Group Comparison: Successful vs Non-Successful Shops
-
-- Define **“successful shop”** (e.g., top 20–25% by sales / engagement metric)  
-- Split dataset into:
-  - **Group A:** Successful shops  
-  - **Group B:** Other shops  
-
-We will:
-
-- Compare distributions of:
-  - Shop age  
-  - Number of listings  
-  - Average rating & review count  
-  - Digital share  
-  - Category focus index  
-
-- Use:
-  - **t-test / Mann–Whitney U** for mean/median comparison  
-  - **Pearson/Spearman correlation** for numeric relationships  
-
-### 2️⃣ Visualizations
-
-Planned plots include:
-
-- Histograms / KDE plots for features split by success group  
-- Boxplots for rating, review_count, and price statistics  
-- Scatter plots (e.g., `num_listings` vs `sales_proxy`, colored by rating)  
-- Correlation heatmaps for numeric features  
+These engineered features are the building blocks for all later analysis and hypothesis tests.
 
 ---
 
-## 🤖 Machine Learning Component
+📊 Exploratory Data Analysis
 
-### 🧩 Classification – Predicting Successful Shops
+Key observations from the visual exploration:
 
-We will train simple models such as:
+- **Shop size and reviews are highly skewed**  
+  Histograms show that most shops have very few listings and zero reviews,  
+  while a small group of shops has many products and a lot of feedback.
 
-- **Logistic Regression**  
-- **Random Forest Classifier**
+- **Relationship between number of listings and reviews**  
+  A scatter plot with logarithmic scales on both axes shows a clear positive relationship:  
+  larger shops tend to accumulate more reviews, although there is still considerable spread.
 
-**Target Variable (Example):**
-
-- `successful_shop = 1` → shop is in top X% by sales/engagement  
-- `successful_shop = 0` → otherwise  
-
-**Input Features (Candidates):**
-
-- Shop age & age bucket  
-- Number of listings & listing intensity  
-- Average rating, review_count  
-- Price statistics  
-- Category focus index  
-- Digital share (if available)
-
-**Evaluation Metrics:**
-
-- Accuracy  
-- Precision / Recall / F1-score  
-- ROC–AUC  
+- **Item price distribution**  
+  A histogram of item prices (with extreme values clipped) reveals that most products  
+  sit in a relatively low price range, with a thin but visible tail of higher-priced items.  
+  This justifies creating “high-price” and “low-price” segments.
 
 ---
 
-### 📉 Optional: Regression – Predicting Sales / Engagement Score
+🧪 Hypothesis Tests and Findings
 
-As an extension, we may treat success as a **continuous** variable:
-
-- Predict `sales` or a normalized engagement score using regression models  
-
-**Metrics:**
-
-- R² Score  
-- MAE (Mean Absolute Error)  
-- RMSE (Root Mean Squared Error)  
+All three hypotheses are tested using two-sample t-tests that allow unequal variances  
+(commonly known as Welch t-tests). The aim is to compare averages between two groups and  
+decide whether the observed differences are statistically significant.
 
 ---
 
-## 📈 Expected Outcomes
+### Hypothesis 1 – Shop Size vs Success
 
-By the end of the project, we expect to:
+**Question**  
+Do shops that receive at least one review tend to list more products than shops with no reviews?
 
-- Identify which shop attributes are **most strongly associated** with success  
-- Understand whether **niche focus** or **broad product range** tends to perform better  
-- See if **digital / print-on-demand** oriented shops behave differently from physical-product shops  
-- Provide a **baseline predictive model** that can estimate the success likelihood of a shop given its basic metadata  
-- Summarize findings with clear **plots, tables, and explanations**  
+**Groups**
 
----
+- Group A: shops marked as successful (at least one review)  
+- Group B: shops with no reviews  
 
-## 🧰 Tech Stack
+**Null hypothesis (H₀)**  
+The average number of active listings is the same in both groups.
 
-- 🐍 **Python**  
-  - `pandas`, `numpy` – data handling  
-  - `matplotlib`, `seaborn` – visualizations  
-  - `scipy` – statistical tests  
-  - `scikit-learn` – machine learning models  
+**Alternative hypothesis (H₁)**  
+Successful shops differ in average shop size (and in practice we expect them to be larger).
 
-- 📓 **Jupyter Notebook / Google Colab** – interactive analysis  
-- 🧾 **Git & GitHub** – version control & documentation  
+**Result and interpretation**
 
----
-
-## 📦 Final Deliverables
-
-- Cleaned and documented datasets (shop-level + optional listing-level)  
-- EDA notebooks with plots and descriptive statistics  
-- Statistical test results (with interpretation)  
-- Machine learning models (classification and/or regression) with evaluation metrics  
-- Final report / summary notebook  
-- This GitHub repository with:
-  - Code  
-  - README  
-  - Plots / figures  
+- The test returns a large positive test statistic and a very small p-value (well below 0.05).  
+- H₀ is rejected.  
+- Successful shops have **significantly more active listings** on average.  
+  In other words, being “larger” is strongly associated with receiving at least some feedback.
 
 ---
 
-## 🔮 Possible Future Work
+### Hypothesis 2 – Engagement per Listing vs Success
 
-- NLP on listing titles & descriptions (sentiment, keyword analysis, text length, etc.)  
-- Time series analysis if temporal sales data is available  
-- Advanced models (e.g., Gradient Boosting / XGBoost)  
-- Interactive dashboard (e.g., **Streamlit** or **Plotly Dash**) where users can simulate hypothetical shops  
+**Question**  
+Do successful shops receive more reviews per listing than shops with no reviews?
 
----
+**Groups**
 
-## Milestone – 28 November
+- Same two groups as in Hypothesis 1,  
+  but the comparison is now made on “reviews per listing”.
 
-- Selected the "Etsy Shops Dataset" from Kaggle (20,000 shops).
-- Performed basic exploratory data analysis:
-  - Histograms of number of listings, review counts, and reviews per listing.
-  - Scatter plot of number of listings vs review count (log–log scale).
-- Defined "successful shop" as having at least one review (review_count > 0).
-- Ran two Welch t-tests:
-  - Successful shops have significantly more active listings on average.
-  - Successful shops have significantly higher reviews per listing on average.
+**Null hypothesis (H₀)**  
+The average number of reviews per listing is the same for successful and non-successful shops.
 
+**Alternative hypothesis (H₁)**  
+Successful shops have a different (expected to be higher) average number of reviews per listing.
 
-## 👥 Authors
+**Result and interpretation**
 
-Prepared by:  
-
-- ✍️ **Şefik Ata Temiz**  
-
-
-Sabancı University · DSA210 · 
+- Again, the test yields a large positive test statistic with a very small p-value.  
+- H₀ is rejected.  
+- Successful shops do not only have more products; each product also tends to receive **more engagement on average**.  
+  This suggests that **quality, visibility or marketing of listings** are also important,  
+  not just opening many products.
 
 ---
 
-## 🤝 AI Assistance Disclosure
+### Hypothesis 3 – High-Price vs Low-Price Items
 
-Parts of this README (structure, formatting, and some wording) were created with the help of **OpenAI ChatGPT**.  
-All analysis decisions, dataset selection, and implementation will be done and validated by the project team.
+**Question**  
+Is the high-price segment (top 25% of items by price) truly different from the rest  
+in terms of average price?
+
+**Groups**
+
+- Group A: items in the top quarter of the price distribution (high-price segment)  
+- Group B: all remaining items (low-price segment)
+
+**Null hypothesis (H₀)**  
+Both segments have the same mean price (no meaningful separation).
+
+**Alternative hypothesis (H₁)**  
+The high-price segment has a different mean price than the low-price segment.
+
+**Result and interpretation**
+
+- The Welch t-test finds a very strong difference between the two groups,  
+  again with a p-value far below 0.05.  
+- H₀ is rejected.  
+- The price-based segmentation is statistically meaningful:  
+  high-price items form a clearly distinct group.  
+  This separation can later be used to compare other characteristics of premium vs regular products.
+
+---
+
+📌 Overall Insights
+
+From the combined shop-level and item-level analysis, the main conclusions are:
+
+1. **Shop size matters**  
+   Shops that receive at least one review tend to have **many more active listings**  
+   compared to shops that never receive feedback.
+
+2. **Engagement per product matters**  
+   Successful shops also perform better in terms of **reviews per listing**.  
+   They do not simply win by sheer volume; their products also attract more attention individually.
+
+3. **Price tiers are clearly separated**  
+   The high-price segment is statistically distinct from the low-price segment.  
+   Price tiers therefore make sense as a basis for further analysis or later models.
+
+Together, these findings suggest that a seller aiming for success on Etsy should work on:
+
+- Expanding the catalog with a healthy number of listings,  
+- Improving engagement for each product (photos, descriptions, tags, marketing),  
+- Being aware of where their products sit in the price spectrum and  
+  possibly treating premium and regular items differently.
+
+---
+
+🧰 Tools Used
+
+- Python (for data cleaning, feature creation, plotting and statistical tests)  
+- Jupyter Notebook / VS Code Jupyter (interactive environment)  
+- Git and GitHub (for version control and project submission)
+
+---
+
+📁 Repository Contents
+
+- Jupyter notebook with the full analysis  
+- Shop-level dataset file  
+- Item-level dataset file  
+- This README explaining the project, methods and main results
+
+---
+
+🤝 AI Assistance Disclosure
+
+The structure and wording of this README were prepared with the help of an AI assistant (OpenAI ChatGPT).  
+All dataset choices, feature definitions, statistical tests and final interpretations  
+were implemented and checked by the project owner.
