@@ -60,6 +60,15 @@ This project aims to answer:
 The shop dataset describes the “storefront”, while the item dataset focuses on individual products and their prices.  
 They are used together to answer both shop-level and price-level questions.
 
+**Etsy Shops Dataset** – Kaggle  
+Author: Sepideh Doost  
+Link: https://www.kaggle.com/datasets/sepidafs/etsy-shops  
+
+**Etsy Items Price** – Kaggle  
+Author: dimakyn  
+Link: https://www.kaggle.com/datasets/dimakyn/etsy-items-price
+
+
 ---
 
 🛠️ Feature Engineering (What I Built From the Raw Data)
