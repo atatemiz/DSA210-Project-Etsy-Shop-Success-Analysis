@@ -7,14 +7,14 @@ Spring 24–25 · DSA210 Term Project
 
 This project studies Etsy shops and their products to understand what “success” looks like on the platform.
 
-Using two publicly available datasets from Kaggle (one at shop level, one at item level), I:
+Using two publicly available Etsy-related datasets from Kaggle (one at shop level, one at item level), I:
 
-- Clean and combine the data,
-- Create new, more informative features,
-- Explore distributions and relationships with visualizations,
-- Investigate three concrete statistical hypotheses about shop success and price levels.
+- Clean and preprocess raw marketplace data,
+- Engineer informative features at both shop and item level,
+- Explore distributions and relationships using visualizations,
+- Investigate three concrete statistical hypotheses related to shop success and item pricing.
 
-The final goal is to turn raw marketplace data into interpretable insights that could guide a small Etsy seller.
+The final goal is to transform raw Etsy marketplace data into interpretable insights that could guide small and independent Etsy sellers.
 
 ---
 
@@ -26,114 +26,115 @@ Etsy is widely used by:
 - 3D-print and handmade product makers  
 - Digital product and print-on-demand sellers  
 
-New sellers usually have questions such as:
+New sellers commonly ask:
 
 - How many products should I list?
-- Do reviews and engagement per product matter as much as the total number of products?
-- How do my price levels relate to performance?
+- Does engagement per product matter as much as total shop size?
+- Is there a relationship between item prices and product popularity?
 
 This project aims to answer:
 
-- Whether larger shops really perform better,
-- Whether engagement quality (reviews per product) differentiates successful shops,
-- Whether item price can be linked to product popularity in a statistically meaningful way.
+- Whether larger shops tend to be more successful,
+- Whether engagement quality differentiates successful shops,
+- Whether item price can be linked to item popularity in a statistically meaningful way.
 
 ---
 
 ## 📂 Datasets Used
 
 ### 1️⃣ Etsy Shops (shop-level dataset)
-- Source: Kaggle – “Etsy Shops Dataset” by Sepideh Doost  
-- Approx. 20,000 shops opened in November–December 2019  
-- Example information:  
-  - Number of active listings per shop  
-  - Total number of reviews  
-  - Favourites, sales counts  
-  - Shop location, creation date, and a shop identifier  
+- **Source:** Kaggle – *“Etsy Shops Dataset”* by Sepideh Doost  
+- **Scope:** ~20,000 shops opened in November–December 2019  
+- **Example attributes:**  
+  - Number of active listings  
+  - Total review count  
+  - Sales and favourites  
+  - Shop creation date and location  
 
-### 2️⃣ Etsy Items Price (item-level dataset)
-- Source: Kaggle – “Etsy Items Price” by dimakyn  
-- Product-level records with:  
-  - Product title  
-  - Shop name  
-  - Item price  
-  - Number of favourites  
-
-The shop dataset describes the “storefront”, while the item dataset focuses on individual products and their prices.  
-They are used together to answer both shop-level and price-level questions.
-
-**Etsy Shops Dataset** – Kaggle  
-Author: Sepideh Doost  
-Link: https://www.kaggle.com/datasets/sepidafs/etsy-shops  
-
-**Etsy Items Price** – Kaggle  
-Author: dimakyn  
-Link: https://www.kaggle.com/datasets/dimakyn/etsy-items-price  
+**Link:**  
+https://www.kaggle.com/datasets/sepidafs/etsy-shops  
 
 ---
 
-## 🛠️ Feature Engineering (What I Built From the Raw Data)
+### 2️⃣ Etsy Items (item-level dataset)
+- **Source:** Kaggle – Etsy item listings dataset (scraped)  
+- **Scope:** Individual product-level observations  
+- **Key attributes used in this project:**  
+  - `cost` (item price)  
+  - `review` (number of reviews, used as a popularity proxy)  
+  - Store and listing identifiers  
 
-### From the shop dataset:
+This dataset provides sufficient variability in item popularity, allowing
+statistically valid analysis of price–popularity relationships.
+
+---
+
+## 🛠️ Feature Engineering
+
+### Shop-level features
 
 - **Shop size**  
-  The number of active listings is used as a measure of how large a shop is.
+  Defined as the number of active listings.
 
 - **Engagement per product**  
-  For each shop, the total number of reviews is divided by the number of active listings,  
-  resulting in “reviews per listing”. Shops with zero listings are handled carefully to avoid
-  invalid divisions.
+  Computed as total reviews divided by active listings
+  (*reviews per listing*). Zero-listing cases are handled safely.
 
-- **Success label for shops**  
-  A shop is marked as “successful” if it has at least one review.  
-  Shops with no reviews are treated as “non-successful”.
+- **Shop success label**  
+  A shop is labeled *successful* if it has at least one review;
+  otherwise it is labeled *non-successful*.
 
-### From the item dataset:
+### Item-level features
 
 - **Clean numeric prices**  
-  Prices are converted into numeric values and rows with invalid or missing prices are removed.
+  Item prices (`cost`) are converted to numeric format and invalid
+  entries are removed.
 
-- **Price-based segments**  
-  The 75th percentile of the price distribution is used to define a “high-price” segment,  
-  while the remaining items form a “low-price” segment.  
-  This segmentation is used to explore price-level differences.
+- **Item popularity measure**  
+  The number of reviews (`review`) is used as a proxy for item popularity.
+
+- **Popularity-based groups**  
+  Items in the top 25% by review count are labeled as *popular items*,
+  while the remaining items form the comparison group.
 
 ---
 
 ## 📊 Exploratory Data Analysis
 
-Key observations from the visual exploration include:
+Key observations include:
 
-- **Highly skewed shop characteristics**  
-  Most shops have very few listings and zero reviews, while a small fraction of shops
-  accumulates many products and substantial feedback.
+- **Strong skewness in shop activity**  
+  Most shops have few listings and no reviews, while a small subset
+  accumulates substantial engagement.
 
-- **Relationship between listings and reviews**  
-  A log–log scatter plot shows a clear positive association between shop size and total
-  reviews, although variability remains high.
+- **Positive relationship between shop size and reviews**  
+  Log–log scatter plots show that larger shops tend to receive more reviews.
 
-- **Item price distribution**  
-  Item prices are concentrated in a lower range with a long tail of higher-priced items,
-  motivating the use of price-based segmentation.
+- **Item-level variation**  
+  Item prices and review counts exhibit meaningful variability,
+  supporting statistical analysis at the product level.
 
 ---
 
 ## 🧪 Hypothesis Tests and Findings
 
-Three hypotheses are investigated using statistical analysis.  
-For the first two hypotheses, two-sample Welch t-tests are applied.  
-For the third hypothesis, exploratory analysis revealed limitations in the item-level
-popularity variable, which affected the choice of statistical testing.
+Three hypotheses are investigated.
+
+Welch two-sample t-tests are used where group comparisons are appropriate.
+For monotonic relationships, non-parametric correlation is applied.
 
 ---
 
 ### Hypothesis 1 – Shop Size vs Success
 
 **Question**  
-Do shops that receive at least one review tend to list more products than shops with no reviews?
+Do shops that receive at least one review tend to list more products?
 
 **Result**  
-The Welch t-test produces a very small p-value, leading to rejection of the null hypothesis.  
+The Welch t-test yields a very small p-value.  
+The null hypothesis is rejected.
+
+**Conclusion**  
 Successful shops have significantly more active listings on average.
 
 ---
@@ -141,11 +142,14 @@ Successful shops have significantly more active listings on average.
 ### Hypothesis 2 – Engagement per Listing vs Success
 
 **Question**  
-Do successful shops receive more reviews per listing than shops with no reviews?
+Do successful shops receive more reviews per listing?
 
 **Result**  
-The Welch t-test again yields a very small p-value.  
-Successful shops not only have more products, but also receive higher engagement per product.
+The Welch t-test again yields a very small p-value.
+
+**Conclusion**  
+Successful shops not only have more products, but also higher engagement
+per product on average.
 
 ---
 
@@ -154,38 +158,39 @@ Successful shops not only have more products, but also receive higher engagement
 **Question**  
 Is item price associated with item popularity?
 
-**Data limitation**  
-Exploratory analysis revealed that the *favourite* variable in the item-level dataset has
-**zero variance across all items**. Because the popularity metric is constant, it does not
-carry usable information.
+**Methodology**  
+- Popularity is measured using item review count.
+- Two complementary analyses are applied:
+  - Spearman rank correlation between price and popularity,
+  - Welch t-test comparing mean prices of popular (top 25%) vs non-popular items.
+
+**Result**  
+Both analyses indicate a statistically significant relationship between
+item price and popularity.
 
 **Conclusion**  
-Due to insufficient variability in the popularity metric, it is not statistically valid
-to perform group-based hypothesis testing or correlation analysis.  
-Therefore, **Hypothesis 3 is rejected**, as no meaningful relationship between item price and
-popularity can be evaluated using this dataset.
+Item price is meaningfully associated with item popularity, suggesting
+that pricing strategies may influence customer engagement at the product level.
 
 ---
 
 ## 📌 Overall Insights
 
 1. **Shop size matters**  
-   Shops that receive at least one review tend to have many more active listings.
+   Larger shops are significantly more likely to receive reviews.
 
-2. **Engagement per product matters**  
-   Successful shops achieve higher reviews per listing, indicating that visibility,
-   quality, or marketing of products is important in addition to sheer volume.
+2. **Engagement quality matters**  
+   Successful shops achieve higher engagement per product, not just higher volume.
 
-3. **Item popularity could not be evaluated**  
-   Although item prices show a clear distribution, the available popularity indicator
-   (favourites) lacks variability. As a result, no statistically valid conclusion can be
-   drawn about the relationship between item price and popularity.
+3. **Item pricing relates to popularity**  
+   At the item level, prices show a statistically significant relationship
+   with product popularity, highlighting the importance of pricing decisions.
 
 ---
 
 ## 🧰 Tools Used
 
-- Python (data cleaning, feature engineering, visualization, statistics)  
+- Python (pandas, NumPy, SciPy, matplotlib)  
 - Jupyter Notebook / VS Code Jupyter  
 - Git and GitHub  
 
@@ -193,15 +198,16 @@ popularity can be evaluated using this dataset.
 
 ## 📁 Repository Contents
 
-- Jupyter notebook containing the full analysis  
-- Shop-level dataset file  
-- Item-level dataset file  
-- This README explaining the project, methods, and findings  
+- Jupyter notebook with the full analysis and outputs  
+- Shop-level Etsy dataset  
+- Item-level Etsy dataset  
+- This README file  
 
 ---
 
 ## 🤝 AI Assistance Disclosure
 
-The structure and wording of this README were prepared with the help of an AI assistant
-(OpenAI ChatGPT). All dataset choices, feature definitions, statistical tests, and final
-interpretations were implemented and verified by the project owner.
+The structure and wording of this README were prepared with the assistance
+of an AI tool (OpenAI ChatGPT). All dataset selection, feature engineering,
+statistical testing, and interpretations were implemented and verified
+by the project owner.
